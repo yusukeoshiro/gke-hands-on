@@ -96,25 +96,32 @@ Confirm that a page is served properly at http://IP_ADDRESS
 
 Note: It may take a several minutes for the global load balancer to get ready!
 
+---
+
 ## Clean up
+#### delete load balancer
 ```bash
-# delete load balancer
 $HANDSON_WORKSPACE/kubemci delete zone-printer \
     --ingress=ingress/ingress.yaml \
     --gcp-project=$GOOGLE_CLOUD_PROJECT \
     --kubeconfig=$HANDSON_WORKSPACE/mcikubeconfig
-
-# delete deployments and services
+```
+#### delete deployments and services
+```bash
 for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do
   kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" delete -f manifests/
 done
+```
 
-#delete ip address
+
+#### delete ip address
+```bash
 gcloud compute addresses delete --global --quiet "${ZP_KUBEMCI_IP}"
+```
 
-# delete clusters
+#### delete clusters
+```bash
 gcloud container clusters delete --zone=asia-northeast1-c --async --quiet $CLUSTER1
 gcloud container clusters delete --zone=us-east4-a --async --quiet $CLUSTER2
 gcloud container clusters delete --zone=europe-west1-c --async --quiet $CLUSTER3
-
 ```
