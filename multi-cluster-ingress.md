@@ -5,6 +5,13 @@ In this hands-on we will create three clusters in three separate regions and dep
 
 We will then use multi-cluster ingress to have a single load balancer serve global traffic from the nearest cluster.
 
+#### Source:
+
+https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress
+
+https://github.com/GoogleCloudPlatform/k8s-multicluster-ingress
+
+
 ## Find out the ID of your project
 ```bash
 gcloud projects list
