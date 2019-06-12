@@ -1,0 +1,120 @@
+# Multi Cluster Ingress Hands-on
+
+## Find out the ID of your project
+```bash
+gcloud projects list
+```
+
+## Set project ID in the environment variable
+```bash
+export GOOGLE_CLOUD_PROJECT=FIXME
+```
+
+## Set default project
+```bash
+gcloud config set project $GOOGLE_CLOUD_PROJECT
+```
+
+## Set the hands on workspace path
+```bash
+export HANDSON_WORKSPACE=$PWD
+```
+
+## Setup clusters
+```bash
+export CLUSTER1=mci-cluster-1
+export CLUSTER2=mci-cluster-2
+export CLUSTER3=mci-cluster-3
+gcloud container clusters create --zone=asia-northeast1-c --async $CLUSTER1
+gcloud container clusters create --zone=us-east4-a --async $CLUSTER2
+gcloud container clusters create --zone=europe-west1-c --async $CLUSTER3
+```
+
+## Check clusters are provisioned
+```bash
+gcloud container clusters list
+```
+
+## Create kubeconfig file containing credentials for all the clusters
+```bash
+cd $HANDSON_WORKSPACE
+KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=asia-northeast1-c $CLUSTER1
+KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=us-east4-a $CLUSTER2
+KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=europe-west1-c $CLUSTER3
+```
+
+
+## Download the kubemci command-line tool and make sure it is executable
+```bash
+cd $HANDSON_WORKSPACE
+wget https://storage.googleapis.com/kubemci-release/release/latest/bin/linux/amd64/kubemci
+chmod +x ./kubemci
+```
+
+
+## Clone hands-on repository
+```bash
+cd $HANDSON_WORKSPACE
+git clone https://github.com/GoogleCloudPlatform/k8s-multicluster-ingress.git
+cd k8s-multicluster-ingress
+git reset --hard ef552c2
+cd examples/zone-printer
+```
+
+## Deploy sample app on all three clusters
+```bash
+for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do
+  kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" create -f manifests/
+done
+```
+
+## Reserve IP Address
+```bash
+ZP_KUBEMCI_IP="zp-kubemci-ip"
+gcloud compute addresses create --global "${ZP_KUBEMCI_IP}"
+```
+
+## Fix ingress.yaml to use the reserved static ip address
+```bash
+sed -i -e "s/\$ZP_KUBEMCI_IP/${ZP_KUBEMCI_IP}/" ingress/ingress.yaml
+```
+
+
+## Deploy multicluster ingress
+```bash
+$HANDSON_WORKSPACE/kubemci create zone-printer \
+    --ingress=ingress/ingress.yaml \
+    --gcp-project=$GOOGLE_CLOUD_PROJECT \
+    --kubeconfig=$HANDSON_WORKSPACE/mcikubeconfig
+```
+
+## Check status
+```bash
+$HANDSON_WORKSPACE/kubemci get-status zone-printer --gcp-project=$GOOGLE_CLOUD_PROJECT
+```
+Confirm that a page is served properly at http://IP_ADDRESS
+
+Note: It may take a several minutes for the global load balancer to get ready!
+
+## Clean up
+```bash
+# delete load balancer
+$HANDSON_WORKSPACE/kubemci delete zone-printer \
+    --ingress=ingress/ingress.yaml \
+    --gcp-project=$GOOGLE_CLOUD_PROJECT \
+    --kubeconfig=$HANDSON_WORKSPACE/mcikubeconfig
+
+# delete deployments and services
+for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do
+  kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" delete -f manifests/
+done
+
+#delete ip address
+gcloud compute addresses delete --global --quiet "${ZP_KUBEMCI_IP}"
+
+# delete clusters
+gcloud container clusters delete --zone=asia-northeast1-c --async --quiet $CLUSTER1
+gcloud container clusters delete --zone=us-east4-a --async --quiet $CLUSTER2
+gcloud container clusters delete --zone=europe-west1-c --async --quiet $CLUSTER3
+
+```
