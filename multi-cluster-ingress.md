@@ -1,5 +1,10 @@
 # Multi Cluster Ingress Hands-on
 
+## About
+In this hands-on we will create three clusters in three separate regions and deploy 3 identitcal applications.
+
+We will then use multi-cluster ingress to have a single load balancer serve global traffic from the nearest cluster.
+
 ## Find out the ID of your project
 ```bash
 gcloud projects list
