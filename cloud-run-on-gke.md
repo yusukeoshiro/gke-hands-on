@@ -3,10 +3,14 @@
 ## About
 
 
-## ENVs
+## Set project ID in the environment variable
 ```bash
-GOOGLE_CLOUD_PROJECT=$(gcloud info --format='value(config.project)')
-echo $GOOGLE_CLOUD_PROJECT
+export GOOGLE_CLOUD_PROJECT=FIXME
+```
+
+## Set default project
+```bash
+gcloud config set project $GOOGLE_CLOUD_PROJECT
 ```
 
 ## Enable API's
