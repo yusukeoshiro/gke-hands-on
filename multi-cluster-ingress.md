@@ -55,8 +55,11 @@ gcloud container clusters create --zone=europe-west1-c --async $CLUSTER3;
 #### Check clusters are running
 ```bash
 gcloud container clusters list
-# alternatively use this command to keep watching.
-# watch gcloud container clusters list
+```
+
+use `watch` command to keep watching
+```bash
+watch gcloud container clusters list
 ```
 
 Continue to the next step AFTER all clusters are provisioned!
