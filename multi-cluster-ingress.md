@@ -12,70 +12,77 @@ https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress
 https://github.com/GoogleCloudPlatform/k8s-multicluster-ingress
 
 
-## Find out the ID of your project
+## Setup Your Environement
+
+### Find out the ID of your project
 ```bash
 gcloud projects list
 ```
 
-## Set project ID in the environment variable
+### Set project ID in the environment variable
 ```bash
 export GOOGLE_CLOUD_PROJECT=FIXME
 ```
 
-## Set default project
+### Set default project
 ```bash
 gcloud config set project $GOOGLE_CLOUD_PROJECT
 ```
 
-## Set the hands on workspace path
+### Set the hands on workspace path
 ```bash
 export HANDSON_WORKSPACE=$PWD
 ```
 
-## Enable API's
+### Enable API's
 ```bash
 gcloud services enable cloudbuild.googleapis.com sourcerepo.googleapis.com containerregistry.googleapis.com container.googleapis.com cloudtrace.googleapis.com cloudprofiler.googleapis.com logging.googleapis.com compute.googleapis.com run.googleapis.com
 ```
 
-## Setup clusters
+## Setup Clusters
+
 ```bash
-export CLUSTER1=mci-cluster-1
+export CLUSTER1=mci-cluster-1;
+export CLUSTER2=mci-cluster-2;
+export CLUSTER3=mci-cluster-3;
 ```
 ```bash
-export CLUSTER2=mci-cluster-2
-```
-```bash
-export CLUSTER3=mci-cluster-3
-```
-```bash
-gcloud container clusters create --zone=asia-northeast1-c --async $CLUSTER1
-```
-```bash
-gcloud container clusters create --zone=us-east4-a --async $CLUSTER2
-```
-```bash
-gcloud container clusters create --zone=europe-west1-c --async $CLUSTER3
+gcloud container clusters create --zone=asia-northeast1-c --async $CLUSTER1;
+gcloud container clusters create --zone=us-east4-a --async $CLUSTER2;
+gcloud container clusters create --zone=europe-west1-c --async $CLUSTER3;
 ```
 
-## Check clusters are provisioned
+#### Check clusters are running
 ```bash
 gcloud container clusters list
+# alternatively use this command to keep watching.
+# watch gcloud container clusters list
 ```
+
+Continue to the next step AFTER all clusters are provisioned!
 
 ## Create kubeconfig file containing credentials for all the clusters
 ```bash
 cd $HANDSON_WORKSPACE
 ```
+
+Output the crednetial for mci-cluster-1
 ```bash
 KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=asia-northeast1-c $CLUSTER1
 ```
+Output the crednetial for mci-cluster-2
 ```bash
 KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=us-east4-a $CLUSTER2
 ```
+Output the crednetial for mci-cluster-3
 ```bash
 KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=europe-west1-c $CLUSTER3
 ```
 
+Confirm that mcikubeconfig contains the credential for 3 clusters
+```bash
+cat $HANDSON_WORKSPACE/mcikubeconfig
+```
 
 ## Download the kubemci command-line tool and make sure it is executable
 ```bash
