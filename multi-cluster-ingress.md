@@ -32,6 +32,11 @@ gcloud config set project $GOOGLE_CLOUD_PROJECT
 export HANDSON_WORKSPACE=$PWD
 ```
 
+## Enable API's
+```bash
+gcloud services enable cloudbuild.googleapis.com sourcerepo.googleapis.com containerregistry.googleapis.com container.googleapis.com cloudtrace.googleapis.com cloudprofiler.googleapis.com logging.googleapis.com compute.googleapis.com run.googleapis.com
+```
+
 ## Setup clusters
 ```bash
 export CLUSTER1=mci-cluster-1
