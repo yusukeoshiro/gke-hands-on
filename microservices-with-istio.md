@@ -92,11 +92,25 @@ gcloud beta container clusters create $CLUSTER \
 gcloud container clusters get-credentials $CLUSTER --zone $ZONE --project $GOOGLE_CLOUD_PROJECT
 ```
 
+## Introduce Service Mesh
+
+In this 3rd part we are going to introduce Service Mesh capabilities
+
+
+### Active Istio
+
 When you deploy your application using kubectl apply, the Istio sidecar injector will automatically inject Envoy containers into your application pods if they are started in namespaces labeled with istio-injection=enabled:
 
 ```bash
 kubectl label namespace default istio-injection=enabled
 ```
+
+### Check Status of Istio System
+
+```bash
+kubectl get pods --namespace=istio-system
+```
+
 
 # Build and Deploy Application on Kubernetes
 
@@ -134,7 +148,7 @@ http://<EXTERNAL-IP>
 http://<EXTERNAL-IP>/product/9SIQT8TOJO
 ```
 
-## Upgrade Hipster Shop Front-end
+## Upgrade Hipster Shop Front-end to v2
 
 
 Make some changes to the source code
@@ -185,20 +199,8 @@ You should now see an Advertisement for Camera on the Cycling page (^_-)
 http://<EXTERNAL-IP>/product/9SIQT8TOJO
 ```
 
-# Introduce Service Mesh
 
-In this 3rd part we are going to introduce Service Mesh capabilities
-
-## Preparation
-
-### Check Status of Istio System
-
-```bash
-kubectl get pods --namespace=istio-system
-```
-
-
-## Upgrade Hipster Shop Front-end
+## Upgrade Hipster Shop Front-end to v3
 
 ### Modify Source Code of AdService
 
@@ -240,7 +242,7 @@ Push to Container Registry
 docker push gcr.io/$GOOGLE_CLOUD_PROJECT/adservice:v3
 ```
 
-### Create new Deployment file for AdService
+## Create new Deployment file for AdService
 
 
 #### Create Deployment for AdService v2
