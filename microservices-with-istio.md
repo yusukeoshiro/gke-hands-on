@@ -210,7 +210,7 @@ Edit the "AdService" source code file:
 nano $HANDSON_WORKSPACE/microservices-demo/src/adservice/src/main/java/hipstershop/AdService.java
 ```
 
-<walkthrough-editor-open-file filePath="microservices-demo/src/adservice/src/main/java/hipstershop/AdService.java"
+<walkthrough-editor-open-file filePath="gke-hands-on/microservices-demo/src/adservice/src/main/java/hipstershop/AdService.java"
                               text="Open AdService.java">
 </walkthrough-editor-open-file>
 
@@ -262,6 +262,11 @@ use nano or vi to create and edit new file :
 ```bash
 nano k8s-adservice-v2.yaml
 ```
+
+<walkthrough-editor-open-file filePath="gke-handson-demo/k8s-adservice-v2.yaml"
+                              text="Open k8s-adservice-v2.yaml">
+</walkthrough-editor-open-file>
+
 
 copy the content below into the file k8s-adservice-v2.yaml:
 
@@ -324,7 +329,7 @@ cd $HANDSON_WORKSPACE
 
 Create a new file Deployment manifest "k8s-adservice-v3.yaml". Replacer "FIXME" with the name of you Google Cloud Project ID
 
-プロジェクトIDの確認方法
+Check your project ID
 ```bash
 echo $GOOGLE_CLOUD_PROJECT
 ```
@@ -333,6 +338,10 @@ use nano or vi to create and edit new file :
 ```bash
 nano k8s-adservice-v3.yaml
 ```
+<walkthrough-editor-open-file filePath="gke-handson-demo/k8s-adservice-v3.yaml"
+                              text="Open k8s-adservice-v3.yaml">
+</walkthrough-editor-open-file>
+
 
 copy the content below into the file k8s-adservice-v3.yaml:
 
@@ -403,6 +412,10 @@ use nano or vi to create and edit new file :
 nano istio-destinationrule-adservice.yaml
 ```
 
+<walkthrough-editor-open-file filePath="gke-handson-demo/istio-destinationrule-adservice.yaml"
+                              text="Open istio-destinationrule-adservice.yaml">
+</walkthrough-editor-open-file>
+
 copy the content below into the file :
 
 ```
@@ -448,6 +461,9 @@ use nano or vi to create and edit new file :
 ```bash
 nano istio-virtualservice-adservice.yaml
 ```
+<walkthrough-editor-open-file filePath="istio-virtualservice-adservice.yaml"
+                              text="Open istio-virtualservice-adservice.yaml">
+</walkthrough-editor-open-file>
 
 copy the content below into the file :
 
