@@ -96,7 +96,6 @@ gcloud container clusters get-credentials microservices-demo --zone $ZONE --proj
 cd $HANDSON_WORKSPACE/microservices-demo
 ```
 
-skaffoldを利用してコンテナのビルドとレジストリへの登録を行なう。
 ### We will use skaffold to build the container and push it and register it in the container registry, and deploy it on Kubernetes Cluster
 
 "gcb" profile allows building and pushing the images on Google Container Builder without requiring docker installed on the developer machine.
@@ -123,61 +122,8 @@ http://<EXTERNAL-IP>
 http://<EXTERNAL-IP>/product/9SIQT8TOJO
 ```
 
-## Upgrade Hipster Shop Front-end
-
-### Modify source code of "AdService"
-
-Edit the following file :
-
-```
-$HANDSON_WORKSPACE/microservices-demo/src/adservice/src/main/java/hipstershop/AdService.java
-```
-
-Change line #210 :
-
-```
-.put("cycling", bike) # Line 210 before change
-.put("cycling", camera) # Line 210 after change
-```
-
-### Rebuild Container & Push it to Container Registry
-
-This time we will use the traditional docker tool to build the container and register it
-
-```bash
-cd $HANDSON_WORKSPACE/microservices-demo/src/adservice/
-```
-
-Build Container and label as v2
-
-```bash
-docker build -t gcr.io/$GOOGLE_CLOUD_PROJECT/adservice:v2 .
-```
-
-Register Container into Registry
-
-```bash
-docker push gcr.io/$GOOGLE_CLOUD_PROJECT/adservice:v2
-```
-
-In normal development pipelines we would use CI service to monitor updates on source code (on commit) and automatically build and push container to registry (skaffold would help you to implment CI/CD)
-
-### Release the new version of Hipster Shop "AdService"
-
-```bash
-kubectl set image deployment/adservice server=gcr.io/$GOOGLE_CLOUD_PROJECT/adservice:v2
-```
-
-You could as well update the kubernetes Deployment manifest for AdService
 
 
-### Check outcome
-
-
-You should now see an Advertisement for Camera on the Cycling page (^_-)
-```
-http://<EXTERNAL-IP>/product/9SIQT8TOJO
-```
 
 
 # Introduce Service Mesh
@@ -190,7 +136,7 @@ http://<EXTERNAL-IP>/product/9SIQT8TOJO
 kubectl get pods --namespace=istio-system
 ```
 
-### Istioによる管理の有効化
+### Activate Istio
 
 When you deploy your application using kubectl apply, the Istio sidecar injector will automatically inject Envoy containers into your application pods if they are started in namespaces labeled with istio-injection=enabled:
 
@@ -208,7 +154,7 @@ Warning : Killing all running Pod is not recommended for real production environ
 
 
 
-## Rebuild and Deploy Hipster Shop
+## Upgrade Hipster Shop Front-end
 
 ### Modify Source Code of AdService
 
@@ -220,8 +166,10 @@ $HANDSON_WORKSPACE/microservices-demo/src/adservice/src/main/java/hipstershop/Ad
 
 Change line #210 :
 
+
+
 ```
-.put("cycling", camera) # Line 210 before change
+.put("cycling", bike) # Line 210 before change
 .put("cycling", airPlant) # Line 210 after change
 ```
 
@@ -247,13 +195,13 @@ docker push gcr.io/$GOOGLE_CLOUD_PROJECT/adservice:v3
 ### Create new Deployment file for AdService
 
 
-#### Create Deployment for AdService v2
+#### Create Deployment for AdService v1
 
 ```bash
 cd $HANDSON_WORKSPACE
 ```
 
-Create a new file Deployment manifest "k8s-adservice-v2.yaml". Replacer "FIXME" with the name of you Google Cloud Project ID
+Create a new file Deployment manifest "k8s-adservice-v1.yaml". Replacer "FIXME" with the name of you Google Cloud Project ID
 
 プロジェクトIDの確認方法
 ```bash
@@ -262,10 +210,10 @@ echo $GOOGLE_CLOUD_PROJECT
 
 use nano or vi to create and edit new file :
 ```bash
-nano k8s-adservice-v2.yaml
+nano k8s-adservice-v1.yaml
 ```
 
-copy the content below into the file k8s-adservice-v2.yaml:
+copy the content below into the file k8s-adservice-v1.yaml:
 
 ```
 apiVersion: apps/v1
@@ -280,12 +228,12 @@ spec:
     metadata:
       labels:
         app: adservice
-        version: v2
+        version: v1
     spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: gcr.io/FIXME/adservice:v2
+        image: gcr.io/FIXME/adservice
         ports:
         - containerPort: 9555
         env:
@@ -315,7 +263,7 @@ spec:
 Apply the new Deployment manifest to deploy the container
 
 ```bash
-kubectl apply -f k8s-adservice-v2.yaml
+kubectl apply -f k8s-adservice-v1.yaml
 ```
 
 #### Create Deployment for AdService v3
@@ -418,9 +366,9 @@ spec:
     loadBalancer:
       simple: ROUND_ROBIN
   subsets:
-  - name: v2
+  - name: v1
     labels:
-      version: v2
+      version: v1
   - name: v3
     labels:
       version: v3
@@ -465,7 +413,7 @@ spec:
   - route:
     - destination:
         host: adservice
-        subset: v2
+        subset: v1
       weight: 80
     - destination:
         host: adservice
@@ -502,7 +450,7 @@ For additional information on configuration parameters for Kubernetes and Istio,
 
 ## (Optional) Cleanup
 
-以下は任意ですが、必要に応じてハンズオンで利用したリソースを削除してください。
+if you want to clean your environment and remove the resources, follow the instruction below
 
 ### Delete the cluster
 ```bash
