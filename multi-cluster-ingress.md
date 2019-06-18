@@ -40,10 +40,20 @@ gcloud services enable cloudbuild.googleapis.com sourcerepo.googleapis.com conta
 ## Setup clusters
 ```bash
 export CLUSTER1=mci-cluster-1
+```
+```bash
 export CLUSTER2=mci-cluster-2
+```
+```bash
 export CLUSTER3=mci-cluster-3
+```
+```bash
 gcloud container clusters create --zone=asia-northeast1-c --async $CLUSTER1
+```
+```bash
 gcloud container clusters create --zone=us-east4-a --async $CLUSTER2
+```
+```bash
 gcloud container clusters create --zone=europe-west1-c --async $CLUSTER3
 ```
 
@@ -55,8 +65,14 @@ gcloud container clusters list
 ## Create kubeconfig file containing credentials for all the clusters
 ```bash
 cd $HANDSON_WORKSPACE
+```
+```bash
 KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=asia-northeast1-c $CLUSTER1
+```
+```bash
 KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=us-east4-a $CLUSTER2
+```
+```bash
 KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=europe-west1-c $CLUSTER3
 ```
 
@@ -64,6 +80,8 @@ KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-creden
 ## Download the kubemci command-line tool and make sure it is executable
 ```bash
 cd $HANDSON_WORKSPACE
+```
+```bash
 wget https://storage.googleapis.com/kubemci-release/release/latest/bin/linux/amd64/kubemci
 chmod +x ./kubemci
 ```
@@ -72,22 +90,30 @@ chmod +x ./kubemci
 ## Clone hands-on repository
 ```bash
 cd $HANDSON_WORKSPACE
+```
+```bash
 git clone https://github.com/GoogleCloudPlatform/k8s-multicluster-ingress.git
+```
+```bash
 cd k8s-multicluster-ingress
+```
+```bash
 git reset --hard ef552c2
+```
+```bash
 cd examples/zone-printer
 ```
 
 ## Deploy sample app on all three clusters
 ```bash
-for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do
-  kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" create -f manifests/
-done
+for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" create -f manifests/ ; done
 ```
 
 ## Reserve IP Address
 ```bash
 ZP_KUBEMCI_IP="zp-kubemci-ip"
+```
+```bash
 gcloud compute addresses create --global "${ZP_KUBEMCI_IP}"
 ```
 
@@ -125,9 +151,7 @@ $HANDSON_WORKSPACE/kubemci delete zone-printer \
 ```
 #### delete deployments and services
 ```bash
-for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do
-  kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" delete -f manifests/
-done
+for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" delete -f manifests/ ; done
 ```
 
 
@@ -139,6 +163,10 @@ gcloud compute addresses delete --global --quiet "${ZP_KUBEMCI_IP}"
 #### delete clusters
 ```bash
 gcloud container clusters delete --zone=asia-northeast1-c --async --quiet $CLUSTER1
+```
+```bash
 gcloud container clusters delete --zone=us-east4-a --async --quiet $CLUSTER2
+```
+```bash
 gcloud container clusters delete --zone=europe-west1-c --async --quiet $CLUSTER3
 ```
