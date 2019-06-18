@@ -66,17 +66,13 @@ Continue to the next step AFTER all clusters are provisioned!
 cd $HANDSON_WORKSPACE
 ```
 
-Output the crednetial for mci-cluster-1
+Output the crednetial for mci-cluster-1 ~ 3
 ```bash
-KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=asia-northeast1-c $CLUSTER1
-```
-Output the crednetial for mci-cluster-2
-```bash
-KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=us-east4-a $CLUSTER2
-```
-Output the crednetial for mci-cluster-3
-```bash
-KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=europe-west1-c $CLUSTER3
+KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=asia-northeast1-c $CLUSTER1;
+
+KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=us-east4-a $CLUSTER2;
+
+KUBECONFIG=$HANDSON_WORKSPACE/mcikubeconfig gcloud container clusters get-credentials --zone=europe-west1-c $CLUSTER3;
 ```
 
 Confirm that mcikubeconfig contains the credential for 3 clusters
@@ -86,29 +82,19 @@ cat $HANDSON_WORKSPACE/mcikubeconfig
 
 ## Download the kubemci command-line tool and make sure it is executable
 ```bash
-cd $HANDSON_WORKSPACE
-```
-```bash
+cd $HANDSON_WORKSPACE;
 wget https://storage.googleapis.com/kubemci-release/release/latest/bin/linux/amd64/kubemci
 chmod +x ./kubemci
 ```
 
-
 ## Clone hands-on repository
 ```bash
-cd $HANDSON_WORKSPACE
-```
-```bash
-git clone https://github.com/GoogleCloudPlatform/k8s-multicluster-ingress.git
-```
-```bash
-cd k8s-multicluster-ingress
-```
-```bash
-git reset --hard ef552c2
-```
-```bash
-cd examples/zone-printer
+cd $HANDSON_WORKSPACE;
+git clone https://github.com/GoogleCloudPlatform/k8s-multicluster-ingress.git;
+cd k8s-multicluster-ingress;
+git reset --hard ef552c2;
+cd examples/zone-printer;
+ls -l
 ```
 
 ## Deploy sample app on all three clusters
@@ -116,21 +102,37 @@ cd examples/zone-printer
 for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" create -f manifests/ ; done
 ```
 
-## Reserve IP Address
+check pods are running fine
 ```bash
-ZP_KUBEMCI_IP="zp-kubemci-ip"
-```
-```bash
-gcloud compute addresses create --global "${ZP_KUBEMCI_IP}"
-```
-
-## Fix ingress.yaml to use the reserved static ip address
-```bash
-sed -i -e "s/\$ZP_KUBEMCI_IP/${ZP_KUBEMCI_IP}/" ingress/ingress.yaml
+for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do
+  kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" get pods ;
+done
 ```
 
+## Create Multi Cluster Ingress
+### Reserve IP Address
+```bash
+ZP_KUBEMCI_IP=zp-kubemci-ip;
+gcloud compute addresses create --global $ZP_KUBEMCI_IP";
+```
 
-## Deploy multicluster ingress
+Check it is reserved
+```bash
+gcloud compute addresses list
+```
+
+### Fix ingress.yaml to use the reserved static ip address
+```bash
+sed -i -e "s/\$ZP_KUBEMCI_IP/${ZP_KUBEMCI_IP}/" ingress/ingress.yaml;
+```
+
+Check the change made
+```bash
+git diff ingress/ingress.yaml
+```
+
+
+### Deploy multicluster ingress
 ```bash
 $HANDSON_WORKSPACE/kubemci create zone-printer \
     --ingress=ingress/ingress.yaml \
@@ -138,7 +140,7 @@ $HANDSON_WORKSPACE/kubemci create zone-printer \
     --kubeconfig=$HANDSON_WORKSPACE/mcikubeconfig
 ```
 
-## Check status
+### Check status
 ```bash
 $HANDSON_WORKSPACE/kubemci get-status zone-printer --gcp-project=$GOOGLE_CLOUD_PROJECT
 ```
@@ -162,18 +164,10 @@ for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE
 ```
 
 
-#### delete ip address
+#### delete ip address and clusters
 ```bash
-gcloud compute addresses delete --global --quiet "${ZP_KUBEMCI_IP}"
-```
-
-#### delete clusters
-```bash
-gcloud container clusters delete --zone=asia-northeast1-c --async --quiet $CLUSTER1
-```
-```bash
-gcloud container clusters delete --zone=us-east4-a --async --quiet $CLUSTER2
-```
-```bash
-gcloud container clusters delete --zone=europe-west1-c --async --quiet $CLUSTER3
+gcloud compute addresses delete --global --quiet "${ZP_KUBEMCI_IP}";
+gcloud container clusters delete --zone=asia-northeast1-c --async --quiet $CLUSTER1;
+gcloud container clusters delete --zone=us-east4-a --async --quiet $CLUSTER2;
+gcloud container clusters delete --zone=europe-west1-c --async --quiet $CLUSTER3;
 ```
