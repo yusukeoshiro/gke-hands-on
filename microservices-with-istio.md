@@ -92,6 +92,12 @@ gcloud beta container clusters create $CLUSTER \
 gcloud container clusters get-credentials $CLUSTER --zone $ZONE --project $GOOGLE_CLOUD_PROJECT
 ```
 
+When you deploy your application using kubectl apply, the Istio sidecar injector will automatically inject Envoy containers into your application pods if they are started in namespaces labeled with istio-injection=enabled:
+
+```bash
+kubectl label namespace default istio-injection=enabled
+```
+
 # Build and Deploy Application on Kubernetes
 
 In the 2nd aprt we are going to deploy our Hipster Shop microservices based application.
@@ -130,6 +136,15 @@ http://<EXTERNAL-IP>/product/9SIQT8TOJO
 
 ## Upgrade Hipster Shop Front-end
 
+
+Make some changes to the source code
+```
+$HANDSON_WORKSPACE/microservices-demo/src/adservice/src/main/java/hipstershop/AdService.java
+```
+```
+.put("cycling", bike)   # line 210 before change
+.put("cycling", camera) # line 210 after change
+```
 
 ### Rebuild Container & Push it to Container Registry
 
@@ -182,23 +197,6 @@ In this 3rd part we are going to introduce Service Mesh capabilities
 kubectl get pods --namespace=istio-system
 ```
 
-### Activate Istio
-
-When you deploy your application using kubectl apply, the Istio sidecar injector will automatically inject Envoy containers into your application pods if they are started in namespaces labeled with istio-injection=enabled:
-
-```bash
-kubectl label namespace default istio-injection=enabled
-```
-
-We are going to stop all currently running pod so they will be restart with Istio sidecar container (Envoy proxy)
-
-```bash
-kubectl delete --all pods
-```
-
-Warning : Killing all running Pod is not recommended for real production environment as it would make your application not available. If your want to enable Istio on currently running application, Instead, you would create new Deployment with appropriate namespace and rollout them. 
-
-
 
 ## Upgrade Hipster Shop Front-end
 
@@ -219,7 +217,7 @@ nano $HANDSON_WORKSPACE/microservices-demo/src/adservice/src/main/java/hipstersh
 
 
 ```
-.put("cycling", bike) # Line 210 before change
+.put("cycling", camera) # Line 210 before change
 .put("cycling", airPlant) # Line 210 after change
 ```
 
