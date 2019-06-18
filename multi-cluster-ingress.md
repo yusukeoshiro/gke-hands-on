@@ -86,7 +86,7 @@ cat $HANDSON_WORKSPACE/mcikubeconfig
 ## Download the kubemci command-line tool and make sure it is executable
 ```bash
 cd $HANDSON_WORKSPACE;
-wget https://storage.googleapis.com/kubemci-release/release/latest/bin/linux/amd64/kubemci
+wget https://storage.googleapis.com/kubemci-release/release/latest/bin/linux/amd64/kubemci ;
 chmod +x ./kubemci
 ```
 
@@ -107,16 +107,14 @@ for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE
 
 check pods are running fine
 ```bash
-for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do
-  kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" get pods ;
-done
+for ctx in $(kubectl config get-contexts -o=name --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig); do kubectl --kubeconfig $HANDSON_WORKSPACE/mcikubeconfig --context="${ctx}" get pods ; done
 ```
 
 ## Create Multi Cluster Ingress
 ### Reserve IP Address
 ```bash
-ZP_KUBEMCI_IP=zp-kubemci-ip;
-gcloud compute addresses create --global $ZP_KUBEMCI_IP";
+export ZP_KUBEMCI_IP=zp-kubemci-ip;
+gcloud compute addresses create --global $ZP_KUBEMCI_IP;
 ```
 
 Check it is reserved
@@ -150,6 +148,8 @@ $HANDSON_WORKSPACE/kubemci get-status zone-printer --gcp-project=$GOOGLE_CLOUD_P
 Confirm that a page is served properly at http://IP_ADDRESS
 
 Note: It may take a several minutes for the global load balancer to get ready!
+
+[geopeeker](https://geopeeker.com/) is a great tool to check your site from different locations.
 
 ---
 
