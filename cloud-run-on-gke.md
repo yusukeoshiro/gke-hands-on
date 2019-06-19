@@ -42,6 +42,11 @@ gcloud beta container clusters create $CLUSTER \
   --enable-autoscaling --min-nodes "1" --max-nodes "30"
 ```
 
+Authenticate with the new cluster
+```bash
+gcloud container clusters get-credentials $CLUSTER --zone=$ZONE --project=$GOOGLE_CLOUD_PROJECT
+```
+
 ## Deploy a new service on the new cluster as Cloud Run on GKE
 ```bash
 export IMAGE=gcr.io/oshiro-work-demo/sinatra-app:latest
